@@ -5,7 +5,9 @@ from Task import Task
 def task_default_serializer(obj: Task):
     # 2. Check the type and call the conversion method
     if isinstance(obj, Task):
+        print("is instance of task")
         return obj.to_dict()
+    print("not instance of task")
     # Let the default encoder handle other types it knows how to serialize
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
@@ -47,9 +49,10 @@ if __name__ == "__main__":
     file_str=""
     try:
         with open('tasks.json', 'r') as file:
-            task_dict = json.load(file)
-            for k, v in task_dict.items():
-                task_dict[k] = Task.from_dict(v)
+            all_tasks_dict = json.load(file)
+            for task_data in all_tasks_dict:
+                task = Task.from_dict(task_data)
+                task_dict[task.id] = task
     except FileNotFoundError:
         print("File was not found. Will create a new one later.")
 
@@ -70,6 +73,8 @@ if __name__ == "__main__":
     print("Writing to tasks.json")
 
     with open('tasks.json','w') as file:
-        for task in task_dict:
-            json_output = json.dumps(task, default=task_default_serializer)
-        json.dump(json_output, file)
+        json_output = str()
+        if len(task_dict) > 0:
+            for (k,v) in task_dict.items():
+                json_output += json.dumps(v,default=task_default_serializer)
+        file.write(json_output)
