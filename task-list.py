@@ -1,42 +1,40 @@
 import argparse
 import json
+from Task import Task
 
-class task:
-    name = ''
-    id = 0
-    done = False
-    in_progress = False
-    def task(self, name):
-        self.name = name
-
-    def set_done(self):
-        if self.in_progress == True:
-            self.done = True
-    
-    def set_in_progress(self):
-        self.in_progress = True
+def task_default_serializer(obj: Task):
+    # 2. Check the type and call the conversion method
+    if isinstance(obj, Task):
+        return obj.to_dict()
+    # Let the default encoder handle other types it knows how to serialize
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Gestor CLI de tareas")
 
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(title="command", dest='command')
 
     # -----------------------
-    # Subcomando: list
+    # Subcomand: list
     # -----------------------
-    list_parser = subparsers.add_parser("list", help="Lista las tareas")
+    list_parser = subparsers.add_parser("list", help="List tasks")
     # (list no necesita más args)
 
     # -----------------------
-    # Subcomando: update
+    # Subcomand: add
     # -----------------------
-    update_parser = subparsers.add_parser("update", help="Actualiza una tarea")
-    update_parser.add_argument("task_id", type=int, help="ID de la tarea")
-    update_parser.add_argument("--text", "-t", required=True, help="Nuevo texto")
+    list_parser = subparsers.add_parser("add", help="Add a task")
+    list_parser.add_argument("task_name", type=str, help="Task name")
 
     # -----------------------
-    # Subcomando: mark
+    # Subcomand: update
+    # -----------------------
+    update_parser = subparsers.add_parser("update", help="Update a task")
+    update_parser.add_argument("task_id", type=int, help="Task id")
+
+    # -----------------------
+    # Subcomand: mark
     # -----------------------
     mark_parser = subparsers.add_parser("mark", help="Marca una tarea como hecha o pendiente")
     mark_parser.add_argument("task_id", type=int)
@@ -45,17 +43,33 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    task_list = dict()
+    task_dict = dict()
     file_str=""
-    print("a")
-    with open('tasks.json', 'r') as file:
-        file_str = file.read()
-    task_list = json.JSONDecoder.decode(file_str)
+    try:
+        with open('tasks.json', 'r') as file:
+            task_dict = json.load(file)
+            for k, v in task_dict.items():
+                task_dict[k] = Task.from_dict(v)
+    except FileNotFoundError:
+        print("File was not found. Will create a new one later.")
 
-    task_list.update(update)
+    print(f"Task dict status: {task_dict}")
+
+    match args.command:
+        case "list":
+            print("Task list may be empty:")
+            for t in task_dict:
+                print(f"ID: {t['id']} - Name: {t['name']} - Done: {t['done']} - In Progress: {t['in_progress']}")
+        case "add":
+            print("Adding a task")
+            task_dict[len(task_dict)] = Task(args.task_name)
+
     # do whatever modification
 
-    task_list_json_output = json.JSONEncoder.encode(task_list)
+    print(task_dict)
+    print("Writing to tasks.json")
 
     with open('tasks.json','w') as file:
-        file.write(task_list_json_output)
+        for task in task_dict:
+            json_output = json.dumps(task, default=task_default_serializer)
+        json.dump(json_output, file)
