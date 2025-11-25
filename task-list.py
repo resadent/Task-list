@@ -59,7 +59,8 @@ if __name__ == "__main__":
             print(task_dict)
         case "add":
             print("Adding a task")
-            task_dict[len(task_dict)] = Task(args.task_name)
+            newtaskid = len(task_dict)
+            task_dict[len(task_dict)] = Task(args.task_name, newtaskid)
 
     # do whatever modification
 

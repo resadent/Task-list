@@ -3,8 +3,9 @@ class Task:
     id = 0
     done = False
     in_progress = False
-    def __init__(self, name: str):
+    def __init__(self, name: str, id: int = 0):
         self.name = name
+        self.id = id
     
     def __str__(self):
         return f"Task(id={self.id}, name={self.name}, done={self.done}, in_progress={self.in_progress})"
