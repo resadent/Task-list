@@ -1,6 +1,6 @@
 import argparse
 import json
-from Task import Task
+from Task import Task, Status
 
 def task_default_serializer(obj: Task):
     # 2. Check the type and call the conversion method
