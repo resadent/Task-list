@@ -42,7 +42,6 @@ if __name__ == "__main__":
     mark_parser.add_argument("task_id", type=int)
     mark_parser.add_argument("in-progress", action="store_true", help="Mark done")
     mark_parser.add_argument("done", action="store_true", help="Mark done")
-    mark_parser.add_argument("undone", action="store_true", help="Mark pending")
 
     args = parser.parse_args()
 
@@ -70,8 +69,6 @@ if __name__ == "__main__":
                     task.set_in_progress()
                 if args.done:
                     task.set_done()
-                if args.undone:
-                    task.done = False
             else:
                 print(f"Task id {args.task_id} not found")
 
