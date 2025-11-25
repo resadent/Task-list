@@ -38,10 +38,11 @@ if __name__ == "__main__":
     # -----------------------
     # Subcomand: mark
     # -----------------------
-    mark_parser = subparsers.add_parser("mark", help="Marca una tarea como hecha o pendiente")
+    mark_parser = subparsers.add_parser("mark", help="Mark a task")
     mark_parser.add_argument("task_id", type=int)
-    mark_parser.add_argument("--done", action="store_true", help="Marcar como hecha")
-    mark_parser.add_argument("--undone", action="store_true", help="Marcar como pendiente")
+    mark_parser.add_argument("in-progress", action="store_true", help="Mark done")
+    mark_parser.add_argument("done", action="store_true", help="Mark done")
+    mark_parser.add_argument("undone", action="store_true", help="Mark pending")
 
     args = parser.parse_args()
 
@@ -61,6 +62,18 @@ if __name__ == "__main__":
             print("Adding a task")
             newtaskid = len(task_dict)
             task_dict[len(task_dict)] = Task(args.task_name, newtaskid)
+        case "mark":
+            print("Marking task")
+            if args.task_id in task_dict:
+                task: Task = task_dict[args.task_id]
+                if args.in_progress:
+                    task.set_in_progress()
+                if args.done:
+                    task.set_done()
+                if args.undone:
+                    task.done = False
+            else:
+                print(f"Task id {args.task_id} not found")
 
     # do whatever modification
 
