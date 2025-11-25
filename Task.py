@@ -14,7 +14,7 @@ class Task:
         self.id = id
     
     def __str__(self):
-        return f"Task(id={self.id}, name={self.name}, done={self.done}, in_progress={self.in_progress})"
+        return f"Task(id={self.id}, name={self.name}, status={self.status.value})"
     
     def __repr__(self):
         return self.__str__()
