@@ -49,32 +49,21 @@ if __name__ == "__main__":
     file_str=""
     try:
         with open('tasks.json', 'r') as file:
-            all_tasks_dict = json.load(file)
-            for task_data in all_tasks_dict:
-                task = Task.from_dict(task_data)
-                task_dict[task.id] = task
+            task_dict = json.load(file)
     except FileNotFoundError:
         print("File was not found. Will create a new one later.")
-
-    print(f"Task dict status: {task_dict}")
 
     match args.command:
         case "list":
             print("Task list may be empty:")
-            for t in task_dict:
-                print(f"ID: {t['id']} - Name: {t['name']} - Done: {t['done']} - In Progress: {t['in_progress']}")
+            print(task_dict)
         case "add":
             print("Adding a task")
             task_dict[len(task_dict)] = Task(args.task_name)
 
     # do whatever modification
 
-    print(task_dict)
     print("Writing to tasks.json")
 
     with open('tasks.json','w') as file:
-        json_output = str()
-        if len(task_dict) > 0:
-            for (k,v) in task_dict.items():
-                json_output += json.dumps(v,default=task_default_serializer)
-        file.write(json_output)
+        json.dump(task_dict, file, default=task_default_serializer, indent=4)
